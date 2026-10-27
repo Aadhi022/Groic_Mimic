@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Explore & Discover Music — GROIC</title>
+  <meta name="description" content="Discover new music, search millions of tracks via YouTube API, filter by genre, and add to shared social rooms.">
+  <link rel="icon" type="image/svg+xml" href="./assets/images/logo.svg">
+
+  <!-- Supabase CDN Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <link rel="stylesheet" href="./css/style.css">
+  <link rel="stylesheet" href="./css/explore.css">
+</head>
+<body>
+
+  <!-- Site Header -->
+  <header class="site-header">
+    <div class="nav-container">
+      <a href="./index.html" class="brand-logo" aria-label="GROIC Home">
+        <img src="./assets/images/logo.svg" alt="" class="brand-icon" />
+        <span>GROIC</span>
+        <span class="brand-tag">2.0</span>
+      </a>
+
+      <nav aria-label="Main Navigation">
+        <ul class="nav-links">
+          <li><a href="./index.html" class="nav-link">Home</a></li>
+          <li><a href="./explore.html" class="nav-link active">Explore</a></li>
+          <li><a href="./rooms.html" class="nav-link">Rooms 🔥</a></li>
+          <li><a href="./player.html" class="nav-link">Player</a></li>
+          <li><a href="./library.html" class="nav-link">My Library</a></li>
+          <li><a href="./about.html" class="nav-link">About</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <!-- Auth user slot -->
+        <div class="header-user-slot"></div>
+
+        <button id="header-mode-badge" class="mode-badge demo" aria-label="Toggle or view API settings">
+          <span class="mode-dot"></span>
+          <span>Checking...</span>
+        </button>
+
+        <button class="mobile-menu-toggle" aria-label="Open mobile navigation menu" aria-expanded="false">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <!-- Search & Discovery Hero -->
+      <section class="explore-hero">
+        <h1 class="explore-title">
+          Explore <span class="text-gradient">Soundscapes</span>
+        </h1>
+        <p class="explore-subtitle">
+          Search real music streams, explore trending rhythms, or send tracks directly into a social room queue.
+        </p>
+
+        <!-- Search Form -->
+        <div class="search-wrapper">
+          <form class="search-form" id="explore-search-form" role="search">
+            <span class="search-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </span>
+            <input 
+              type="text" 
+              id="search-input" 
+              class="search-input" 
+              placeholder="Search by artist, track, or mood (e.g. Daft Punk, Synthwave, Lofi)..." 
+              autocomplete="off"
+            />
+            <div class="search-actions">
+              <button type="button" class="btn-clear" id="btn-clear-search" aria-label="Clear search input">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+              <button type="submit" class="btn btn-primary btn-search" id="btn-submit-search">
+                Search
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Genre & Mood Filter Chips -->
+        <div class="filter-section">
+          <div class="filter-heading">Curated Moods & Genres</div>
+          <div class="chips-container" id="genre-chips-container">
+            <button class="chip active" data-genre="Trending Sounds">🔥 Trending Sounds</button>
+            <button class="chip" data-genre="Lo-fi">📚 Lo-Fi</button>
+            <button class="chip" data-genre="Electronic">⚡ Electronic</button>
+            <button class="chip" data-genre="Chill">☕ Chill</button>
+            <button class="chip" data-genre="Pop">✨ Pop</button>
+            <button class="chip" data-genre="Rock">🎸 Rock</button>
+            <button class="chip" data-genre="Hip-Hop">🎤 Hip-Hop</button>
+            <button class="chip" data-genre="Indie">🌿 Indie</button>
+            <button class="chip" data-genre="Workout">💪 Workout</button>
+            <button class="chip" data-genre="Classical">🎻 Classical</button>
+            <button class="chip" data-genre="Synthwave">🌌 Synthwave</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Results Section -->
+      <section style="margin-bottom: var(--space-3xl);">
+        <div class="results-header">
+          <h2 class="results-query-title" id="results-heading">Showing Trending Sounds</h2>
+          <div id="catalog-mode-badge" class="catalog-source-tag demo">
+            <span class="mode-dot"></span>
+            <span id="catalog-mode-text">Demo Catalog</span>
+          </div>
+        </div>
+
+        <!-- Informative Demo Mode Notice -->
+        <div id="demo-mode-explainer" class="storage-status-banner" style="display:none; margin-bottom:1.5rem;">
+          <div class="storage-status-content">
+            <div class="storage-status-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+            </div>
+            <div class="storage-status-text">
+              <h4>Demo Mode Active</h4>
+              <p id="demo-mode-reason">
+                You are currently exploring a curated catalog of real YouTube music streams. To search live YouTube Data API v3 directly, click "Configure API Key".
+              </p>
+            </div>
+          </div>
+          <button class="btn btn-secondary btn-sm" data-action="open-settings">Configure API Key</button>
+        </div>
+
+        <!-- Results Grid Container -->
+        <div class="music-grid" id="explore-results-grid"></div>
+
+        <!-- Empty & Error State Container -->
+        <div id="explore-state-box" class="state-box" style="display:none;"></div>
+
+        <!-- Load More Pagination -->
+        <div class="pagination-wrap" id="pagination-container" style="display:none;">
+          <button class="btn btn-secondary btn-lg" id="btn-load-more">
+            <span>Load More Results</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <div>&copy; 2026 GROIC — Static Web Application for GitHub Pages</div>
+        <div style="display:flex; gap:var(--space-md);">
+          <a href="./about.html">About</a>
+          <a href="#" data-action="open-settings">API Key Settings</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Core Scripts -->
+  <script src="./js/config.js"></script>
+  <script src="./js/storage.js"></script>
+  <script src="./js/services/supabase-client.js"></script>
+  <script src="./js/services/local-library-service.js"></script>
+  <script src="./js/services/supabase-library-service.js"></script>
+  <script src="./js/services/room-service.js"></script>
+  <script src="./js/youtube.js"></script>
+  <script src="./js/services/music-service.js"></script>
+  <script src="./js/playlists.js"></script>
+  <script src="./js/auth.js"></script>
+  <script src="./js/main.js"></script>
+
+  <!-- Explore Page Controller -->
+  <script>
+    (function () {
+      let currentQuery = '';
+      let currentPageToken = null;
+      let isLoading = false;
+      let currentTracks = [];
+
+      const searchForm = document.getElementById('explore-search-form');
+      const searchInput = document.getElementById('search-input');
+      const clearBtn = document.getElementById('btn-clear-search');
+      const resultsGrid = document.getElementById('explore-results-grid');
+      const resultsHeading = document.getElementById('results-heading');
+      const catalogBadge = document.getElementById('catalog-mode-badge');
+      const catalogModeText = document.getElementById('catalog-mode-text');
+      const demoExplainer = document.getElementById('demo-mode-explainer');
+      const demoReasonText = document.getElementById('demo-mode-reason');
+      const stateBox = document.getElementById('explore-state-box');
+      const paginationContainer = document.getElementById('pagination-container');
+      const loadMoreBtn = document.getElementById('btn-load-more');
+      const chips = document.querySelectorAll('.chip');
+
+      document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const queryParam = urlParams.get('q') || urlParams.get('search');
+        const genreParam = urlParams.get('genre');
+
+        if (queryParam) {
+          searchInput.value = queryParam;
+          clearBtn.classList.add('visible');
+          executeSearch(queryParam);
+        } else if (genreParam) {
+          selectChipByGenre(genreParam);
+          executeSearch(genreParam);
+        } else {
+          executeSearch('Trending Sounds');
+        }
+
+        bindEvents();
+      });
+
+      function bindEvents() {
+        searchForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const query = searchInput.value.trim();
+          if (query) {
+            deactivateAllChips();
+            executeSearch(query);
+          }
+        });
+
+        searchInput.addEventListener('input', () => {
+          clearBtn.classList.toggle('visible', searchInput.value.trim().length > 0);
+        });
+
+        clearBtn.addEventListener('click', () => {
+          searchInput.value = '';
+          clearBtn.classList.remove('visible');
+          searchInput.focus();
+        });
+
+        chips.forEach(chip => {
+          chip.addEventListener('click', () => {
+            chips.forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            const genre = chip.dataset.genre;
+            searchInput.value = '';
+            clearBtn.classList.remove('visible');
+            executeSearch(genre);
+          });
+        });
+
+        loadMoreBtn.addEventListener('click', () => {
+          if (currentPageToken && !isLoading) {
+            loadMoreResults();
+          }
+        });
+      }
+
+      function selectChipByGenre(genre) {
+        chips.forEach(c => {
+          if (c.dataset.genre.toLowerCase() === genre.toLowerCase()) {
+            c.classList.add('active');
+          } else {
+            c.classList.remove('active');
+          }
+        });
+      }
+
+      function deactivateAllChips() {
+        chips.forEach(c => c.classList.remove('active'));
+      }
+
+      async function executeSearch(query) {
+        if (isLoading) return;
+        isLoading = true;
+        currentQuery = query;
+        currentPageToken = null;
+        currentTracks = [];
+
+        resultsHeading.textContent = `Searching for "${escapeHtml(query)}"...`;
+        showSkeletons(6);
+        stateBox.style.display = 'none';
+        paginationContainer.style.display = 'none';
+
+        try {
+          const result = await GroicMusicService.search(query);
+          isLoading = false;
+          updateModeBadge(result);
+
+          if (!result.items || result.items.length === 0) {
+            showEmptyState(query);
+            return;
+          }
+
+          currentTracks = result.items;
+          currentPageToken = result.nextPageToken;
+
+          resultsHeading.textContent = `Results for "${escapeHtml(query)}"`;
+          renderTrackCards(currentTracks);
+          GroicMusicService.setQueue(currentTracks, 0);
+
+          if (currentPageToken) {
+            paginationContainer.style.display = 'flex';
+          }
+        } catch (err) {
+          isLoading = false;
+          showErrorState(err.message || 'Failed to complete search.');
+        }
+      }
+
+      async function loadMoreResults() {
+        if (!currentPageToken || isLoading) return;
+        isLoading = true;
+        loadMoreBtn.disabled = true;
+        loadMoreBtn.textContent = 'Loading more...';
+
+        try {
+          const result = await GroicMusicService.search(currentQuery, currentPageToken);
+          isLoading = false;
+          loadMoreBtn.disabled = false;
+          loadMoreBtn.innerHTML = `<span>Load More Results</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+
+          if (result.items && result.items.length > 0) {
+            currentTracks = currentTracks.concat(result.items);
+            currentPageToken = result.nextPageToken;
+            renderTrackCards(currentTracks);
+            GroicMusicService.setQueue(currentTracks, 0);
+          }
+
+          if (!currentPageToken) {
+            paginationContainer.style.display = 'none';
+          }
+        } catch (err) {
+          isLoading = false;
+          loadMoreBtn.disabled = false;
+          loadMoreBtn.textContent = 'Load More Results';
+          window.GroicApp.showToast('Failed to load more results', 'error');
+        }
+      }
+
+      function updateModeBadge(result) {
+        if (result.isLive) {
+          catalogBadge.className = 'catalog-source-tag live';
+          catalogModeText.textContent = 'Live YouTube Search';
+          demoExplainer.style.display = 'none';
+        } else {
+          catalogBadge.className = 'catalog-source-tag demo';
+          catalogModeText.textContent = 'Demo Catalog';
+          demoExplainer.style.display = 'flex';
+
+          if (result.fallbackFromError) {
+            demoReasonText.textContent = result.isQuotaExceeded
+              ? 'YouTube API quota limit exceeded for today. Automatically switched to curated demo catalog.'
+              : `YouTube API returned an error (${result.error}). Showing curated demo catalog.`;
+          } else {
+            demoReasonText.textContent = 'No YouTube API key is configured. Showing curated catalog of genuine playable YouTube streams.';
+          }
+        }
+      }
+
+      function showSkeletons(count = 6) {
+        resultsGrid.innerHTML = '';
+        for (let i = 0; i < count; i++) {
+          const sk = document.createElement('div');
+          sk.className = 'skeleton-card';
+          resultsGrid.appendChild(sk);
+        }
+      }
+
+      function renderTrackCards(tracks) {
+        resultsGrid.innerHTML = '';
+
+        tracks.forEach((track, index) => {
+          const card = document.createElement('div');
+          card.className = 'music-card';
+
+          const isSaved = GroicLocalLibrary.isSongSaved(track.id);
+
+          card.innerHTML = `
+            <div class="thumbnail-box">
+              <img src="${track.thumbnail || './assets/images/default-cover.svg'}" alt="${escapeHtml(track.title)}" class="thumbnail-img" loading="lazy" />
+              <div class="thumbnail-overlay">
+                <button class="btn-play-overlay btn-play-track" aria-label="Play ${escapeHtml(track.title)}">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                </button>
+              </div>
+            </div>
+            <div class="card-details">
+              <div class="card-title" title="${escapeHtml(track.title)}">${escapeHtml(track.title)}</div>
+              <div class="card-channel">${escapeHtml(track.channel)}</div>
+              <div class="card-actions">
+                <button class="btn btn-primary btn-sm btn-play-track" style="padding:4px 12px; font-size:0.78rem;">
+                  Play
+                </button>
+                <div style="display:flex; gap:4px;">
+                  <button class="btn-card-action btn-add-room" title="Add to Room Queue" aria-label="Add to Room Queue">
+                    <span style="font-size:0.9rem;">📻</span>
+                  </button>
+                  <button class="btn-card-action btn-add-pl" title="Add to Playlist" aria-label="Add to Playlist">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                  </button>
+                  <button class="btn-card-action btn-save ${isSaved ? 'saved' : ''}" title="Save track" aria-label="Save track">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="${isSaved ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
+                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+
+          // Play trigger
+          card.querySelectorAll('.btn-play-track').forEach(btn => {
+            btn.addEventListener('click', () => {
+              GroicMusicService.setQueue(tracks, index);
+              window.location.href = `./player.html?v=${track.id}&title=${encodeURIComponent(track.title)}&channel=${encodeURIComponent(track.channel)}&thumb=${encodeURIComponent(track.thumbnail)}`;
+            });
+          });
+
+          // Save trigger
+          const saveBtn = card.querySelector('.btn-save');
+          saveBtn.addEventListener('click', () => {
+            const currentlySaved = GroicLocalLibrary.isSongSaved(track.id);
+            if (currentlySaved) {
+              GroicLocalLibrary.removeSavedSong(track.id);
+              saveBtn.classList.remove('saved');
+              saveBtn.querySelector('svg').setAttribute('fill', 'none');
+              window.GroicApp.showToast('Removed from saved songs', 'info');
+            } else {
+              GroicLocalLibrary.saveSong(track);
+              saveBtn.classList.add('saved');
+              saveBtn.querySelector('svg').setAttribute('fill', 'currentColor');
+              window.GroicApp.showToast('Saved to library', 'success');
+            }
+          });
+
+          // Add to playlist trigger
+          const addPlBtn = card.querySelector('.btn-add-pl');
+          addPlBtn.addEventListener('click', () => {
+            GroicPlaylists.openAddToPlaylistModal(track);
+          });
+
+          // Add to room queue trigger
+          const addRoomBtn = card.querySelector('.btn-add-room');
+          addRoomBtn.addEventListener('click', () => {
+            openAddToRoomModal(track);
+          });
+
+          resultsGrid.appendChild(card);
+        });
+      }
+
+      function openAddToRoomModal(track) {
+        const roomId = prompt('Enter the Room ID or join a room first to queue this track:\n(You can also create a room on the Rooms page)');
+        if (roomId && roomId.trim()) {
+          GroicRoomService.addToQueue(roomId.trim(), track).then(res => {
+            if (res.success) {
+              window.GroicApp.showToast(res.message, 'success');
+            } else {
+              window.GroicApp.showToast(res.message, 'error');
+            }
+          });
+        }
+      }
+
+      function showEmptyState(query) {
+        resultsGrid.innerHTML = '';
+        stateBox.style.display = 'block';
+        stateBox.innerHTML = `
+          <div class="state-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </div>
+          <h3 class="state-title">No Tracks Found</h3>
+          <p class="state-desc">We couldn't find any results matching "${escapeHtml(query)}". Try another artist or choose one of our curated mood chips.</p>
+          <button class="btn btn-secondary btn-sm" id="btn-reset-search">View Trending Sounds</button>
+        `;
+
+        document.getElementById('btn-reset-search').addEventListener('click', () => {
+          selectChipByGenre('Trending Sounds');
+          executeSearch('Trending Sounds');
+        });
+      }
+
+      function showErrorState(message) {
+        resultsGrid.innerHTML = '';
+        stateBox.style.display = 'block';
+        stateBox.innerHTML = `
+          <div class="state-icon" style="color:var(--accent-coral);">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+          </div>
+          <h3 class="state-title">Search Encountered an Issue</h3>
+          <p class="state-desc">${escapeHtml(message)}</p>
+          <div style="display:flex; justify-content:center; gap:var(--space-sm);">
+            <button class="btn btn-primary btn-sm" id="btn-retry-search">Try Again</button>
+            <button class="btn btn-secondary btn-sm" data-action="open-settings">Check API Key</button>
+          </div>
+        `;
+
+        document.getElementById('btn-retry-search').addEventListener('click', () => {
+          executeSearch(currentQuery);
+        });
+      }
+
+      function escapeHtml(str) {
+        return (str || '').replace(/[&<>"']/g, function (m) {
+          return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m];
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

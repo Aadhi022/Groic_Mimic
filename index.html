@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>GROIC — Social Music Discovery & Live Listening Rooms</title>
+  <meta name="description" content="Discover new sounds, create live listening rooms, and listen to YouTube music together in real time.">
+  <link rel="icon" type="image/svg+xml" href="./assets/images/logo.svg">
+
+  <!-- Supabase CDN Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Core Styles -->
+  <link rel="stylesheet" href="./css/style.css">
+  <link rel="stylesheet" href="./css/explore.css">
+  <link rel="stylesheet" href="./css/rooms.css">
+
+  <style>
+    .hero-section {
+      padding: clamp(3rem, 8vw, 6rem) 0 var(--space-3xl);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-glow-bg {
+      position: absolute;
+      top: -10%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.25) 0%, rgba(236, 72, 153, 0.15) 45%, transparent 70%);
+      filter: blur(60px);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: var(--space-2xl);
+      align-items: center;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(139, 92, 246, 0.12);
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--accent-purple);
+      margin-bottom: var(--space-md);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .hero-headline {
+      font-size: clamp(2.4rem, 5.5vw, 4.2rem);
+      font-weight: 800;
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+      margin-bottom: var(--space-lg);
+    }
+
+    .hero-subtext {
+      font-size: clamp(1.05rem, 2vw, 1.25rem);
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: var(--space-xl);
+      max-width: 540px;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      flex-wrap: wrap;
+    }
+
+    .hero-visual {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+
+    .floating-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: var(--space-md);
+      box-shadow: var(--shadow-lg), 0 0 30px rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      backdrop-filter: blur(12px);
+      transition: transform var(--transition-normal);
+      animation: floatMotion 6s ease-in-out infinite alternate;
+    }
+
+    .floating-card:nth-child(2) {
+      margin-left: 2rem;
+      animation-delay: -3s;
+      border-color: rgba(236, 72, 153, 0.3);
+      box-shadow: 0 10px 30px rgba(236, 72, 153, 0.15);
+    }
+
+    @keyframes floatMotion {
+      0% { transform: translateY(0px); }
+      100% { transform: translateY(-10px); }
+    }
+
+    .floating-thumb {
+      width: 72px;
+      height: 72px;
+      border-radius: var(--radius-md);
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .equalizer-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      height: 20px;
+    }
+
+    .eq-bar {
+      width: 3px;
+      background: var(--accent-magenta);
+      border-radius: 2px;
+      animation: eqBounce 1.2s ease-in-out infinite alternate;
+    }
+
+    .eq-bar:nth-child(1) { height: 40%; animation-delay: 0.1s; }
+    .eq-bar:nth-child(2) { height: 90%; animation-delay: 0.3s; }
+    .eq-bar:nth-child(3) { height: 60%; animation-delay: 0.2s; }
+    .eq-bar:nth-child(4) { height: 100%; animation-delay: 0.4s; }
+
+    @keyframes eqBounce {
+      0% { height: 20%; }
+      100% { height: 100%; }
+    }
+
+    .features-section {
+      padding: var(--space-3xl) 0;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .section-center-head {
+      text-align: center;
+      max-width: 640px;
+      margin: 0 auto var(--space-2xl);
+    }
+
+    .step-card {
+      background: var(--grad-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: var(--space-xl);
+      position: relative;
+    }
+
+    .step-number {
+      font-size: 3rem;
+      font-weight: 800;
+      color: rgba(255, 255, 255, 0.05);
+      position: absolute;
+      top: 1rem;
+      right: 1.5rem;
+      line-height: 1;
+    }
+
+    .step-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      background: rgba(139, 92, 246, 0.15);
+      color: var(--accent-purple);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: var(--space-md);
+    }
+
+    .experience-box {
+      background: linear-gradient(135deg, rgba(21, 26, 43, 0.9) 0%, rgba(15, 18, 29, 0.9) 100%);
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      border-radius: var(--radius-xl);
+      padding: var(--space-2xl);
+      margin: var(--space-3xl) 0;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(139, 92, 246, 0.1);
+    }
+
+    .final-cta {
+      background: var(--grad-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: clamp(2rem, 5vw, 4rem) var(--space-lg);
+      text-align: center;
+      margin: var(--space-3xl) 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .final-cta::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(236, 72, 153, 0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    @media (max-width: 900px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+      }
+      .floating-card:nth-child(2) {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Site Header -->
+  <header class="site-header">
+    <div class="nav-container">
+      <a href="./index.html" class="brand-logo" aria-label="GROIC Home">
+        <img src="./assets/images/logo.svg" alt="" class="brand-icon" />
+        <span>GROIC</span>
+        <span class="brand-tag">2.0</span>
+      </a>
+
+      <nav aria-label="Main Navigation">
+        <ul class="nav-links">
+          <li><a href="./index.html" class="nav-link active">Home</a></li>
+          <li><a href="./explore.html" class="nav-link">Explore</a></li>
+          <li><a href="./rooms.html" class="nav-link">Rooms 🔥</a></li>
+          <li><a href="./player.html" class="nav-link">Player</a></li>
+          <li><a href="./library.html" class="nav-link">My Library</a></li>
+          <li><a href="./about.html" class="nav-link">About</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <!-- Auth user slot -->
+        <div class="header-user-slot"></div>
+
+        <button id="header-mode-badge" class="mode-badge demo" aria-label="Toggle or view API settings">
+          <span class="mode-dot"></span>
+          <span>Checking...</span>
+        </button>
+
+        <a href="./rooms.html" class="btn btn-primary btn-sm">Social Rooms 🔥</a>
+
+        <button class="mobile-menu-toggle" aria-label="Open mobile navigation menu" aria-expanded="false">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-glow-bg"></div>
+      <div class="container">
+        <div class="hero-grid">
+          <div>
+            <div class="hero-eyebrow">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+              <span>Synchronized Social Music</span>
+            </div>
+            <h1 class="hero-headline">
+              Music Hits Different <span class="text-gradient">When We Share It.</span>
+            </h1>
+            <p class="hero-subtext">
+              Create a room. Invite your people. Discover public rooms. Listen to music together in real time with synchronized YouTube playback and live presence.
+            </p>
+            <div class="hero-actions">
+              <a href="./rooms.html" class="btn btn-primary btn-lg">Explore Live Rooms 🔥</a>
+              <a href="./explore.html" class="btn btn-secondary btn-lg">Search YouTube Music</a>
+            </div>
+          </div>
+
+          <!-- Hero Visual Composition -->
+          <div class="hero-visual">
+            <div class="floating-card">
+              <img src="https://i.ytimg.com/vi/jfKfPfyJRdk/hqdefault.jpg" alt="Lofi Girl cover" class="floating-thumb" />
+              <div style="flex:1; min-width:0;">
+                <div style="font-weight:700; font-size:0.95rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                  Tokyo Lo-Fi Study Lounge ☕
+                </div>
+                <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:4px;">5 Listeners Online • Host: Haruki</div>
+                <div class="equalizer-bars">
+                  <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
+                </div>
+              </div>
+              <a href="./room.html?id=demo-room-lofi-01" class="btn btn-primary btn-sm" style="border-radius:50%; width:40px; height:40px; padding:0;" aria-label="Join room">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+              </a>
+            </div>
+
+            <div class="floating-card">
+              <img src="https://i.ytimg.com/vi/4xDzrJKXOOY/hqdefault.jpg" alt="Synthwave radio cover" class="floating-thumb" />
+              <div style="flex:1; min-width:0;">
+                <div style="font-weight:700; font-size:0.95rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                  Midnight Neon Synthwave 🌌
+                </div>
+                <div style="font-size:0.8rem; color:var(--text-muted);">4/6 Listeners • Trending #1</div>
+              </div>
+              <a href="./room.html?id=demo-room-synth-02" class="btn btn-secondary btn-sm" style="border-radius:50%; width:40px; height:40px; padding:0;" aria-label="Join room">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Social Room Spotlight Banner -->
+    <section class="container" style="margin-bottom: var(--space-3xl);">
+      <div style="background: linear-gradient(135deg, #1c1532 0%, #0d1222 100%); border: 1px solid rgba(236,72,153,0.3); border-radius: var(--radius-xl); padding: var(--space-xl); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-lg); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+        <div>
+          <span class="room-privacy-tag private" style="margin-bottom: 6px; display: inline-block;">NEW IN GROIC 2.0</span>
+          <h2 style="font-size: 1.6rem; font-weight: 800; margin-bottom: 4px;">Host a Private Room for Your Favorite People</h2>
+          <p style="color: var(--text-muted); font-size: 0.95rem; max-width: 580px;">
+            Set capacity from 2 to 10 listeners, copy an encrypted secret invite link, and stream official YouTube music in perfect sync with real-time drift correction.
+          </p>
+        </div>
+        <div style="display:flex; gap:var(--space-sm);">
+          <a href="./rooms.html" class="btn btn-primary btn-lg">Browse & Create Rooms &rarr;</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Discovery Preview Section -->
+    <section class="container" style="margin-bottom: var(--space-3xl);">
+      <div class="results-header">
+        <div>
+          <h2 style="font-size: 1.85rem; font-weight: 800; margin-bottom: 4px;">Featured Discovery</h2>
+          <p style="color: var(--text-muted); font-size: 0.95rem;">Tap any track to jump right into the audio-visual player</p>
+        </div>
+        <a href="./explore.html" class="btn btn-outline btn-sm">View All in Explore &rarr;</a>
+      </div>
+
+      <div class="music-grid" id="homepage-featured-grid">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="features-section">
+      <div class="container">
+        <div class="section-center-head">
+          <h2 style="font-size: 2rem; font-weight: 800; margin-bottom: var(--space-xs);">How Social Listening Works</h2>
+          <p style="color: var(--text-muted);">Real-time synchronized streams backed by official YouTube embeds and Supabase Realtime.</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-lg);">
+          <div class="step-card">
+            <span class="step-number">01</span>
+            <div class="step-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            </div>
+            <h3 style="font-size: 1.2rem; margin-bottom: 8px;">Create or Join a Room</h3>
+            <p style="color: var(--text-muted); font-size: 0.92rem;">
+              Set up a public space for community discovery or generate an invite code for a private 2–10 person listening session.
+            </p>
+          </div>
+
+          <div class="step-card">
+            <span class="step-number">02</span>
+            <div class="step-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            </div>
+            <h3 style="font-size: 1.2rem; margin-bottom: 8px;">Synchronized Playback</h3>
+            <p style="color: var(--text-muted); font-size: 0.92rem;">
+              When the host plays, pauses, or seeks, Supabase broadcasts state updates with automatic drift correction for every listener.
+            </p>
+          </div>
+
+          <div class="step-card">
+            <span class="step-number">03</span>
+            <div class="step-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+            </div>
+            <h3 style="font-size: 1.2rem; margin-bottom: 8px;">Collaborative Queue</h3>
+            <p style="color: var(--text-muted); font-size: 0.92rem;">
+              Queue upcoming YouTube tracks together in real time, see who added what, and watch the stream auto-advance.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Final CTA Banner -->
+    <section class="container">
+      <div class="final-cta">
+        <h2 style="font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; margin-bottom: var(--space-sm);">
+          Ready to Listen Together?
+        </h2>
+        <p style="color: var(--text-muted); font-size: 1.1rem; max-width: 580px; margin: 0 auto var(--space-xl);">
+          Start a room in seconds. Free, open-source, and hosted straight from static GitHub Pages.
+        </p>
+        <div style="display: flex; justify-content: center; gap: var(--space-md); flex-wrap: wrap;">
+          <a href="./rooms.html" class="btn btn-primary btn-lg">Discover Rooms 🔥</a>
+          <a href="./about.html" class="btn btn-secondary btn-lg">How It's Engineered</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="./index.html" class="brand-logo" style="margin-bottom: var(--space-xs);">
+            <img src="./assets/images/logo.svg" alt="" class="brand-icon" />
+            <span>GROIC</span>
+          </a>
+          <p>
+            Social music listening platform with real-time room sync, YouTube search, and cloud playlists.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Navigation</h4>
+          <ul>
+            <li><a href="./index.html">Home</a></li>
+            <li><a href="./explore.html">Explore Music</a></li>
+            <li><a href="./rooms.html">Social Rooms 🔥</a></li>
+            <li><a href="./player.html">Web Player</a></li>
+            <li><a href="./library.html">My Library</a></li>
+            <li><a href="./about.html">About Project</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Social Rooms</h4>
+          <ul>
+            <li><a href="./rooms.html">Trending Rooms</a></li>
+            <li><a href="./rooms.html#public-rooms-section">Public Rooms</a></li>
+            <li><a href="./rooms.html" data-action="open-create-room">Create Private Room</a></li>
+            <li><a href="#" data-action="open-settings">API & Cloud Settings</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Architecture</h4>
+          <ul>
+            <li><a href="./about.html#architecture">Pure Static Web</a></li>
+            <li><a href="./about.html#supabase">Supabase Realtime</a></li>
+            <li><a href="./about.html#security">Atomic Capacity & RLS</a></li>
+            <li><a href="#" data-action="open-auth">Cloud Account</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>
+          &copy; 2026 GROIC — Designed for GitHub Pages. Powered by YouTube Data API v3 and Supabase Realtime.
+        </div>
+        <div style="display: flex; gap: var(--space-md);">
+          <a href="./about.html">Architecture & Privacy</a>
+          <a href="#" data-action="open-settings">API Configuration</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Core Scripts -->
+  <script src="./js/config.js"></script>
+  <script src="./js/storage.js"></script>
+  <script src="./js/services/supabase-client.js"></script>
+  <script src="./js/services/local-library-service.js"></script>
+  <script src="./js/services/supabase-library-service.js"></script>
+  <script src="./js/services/room-service.js"></script>
+  <script src="./js/youtube.js"></script>
+  <script src="./js/services/music-service.js"></script>
+  <script src="./js/playlists.js"></script>
+  <script src="./js/auth.js"></script>
+  <script src="./js/main.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const grid = document.getElementById('homepage-featured-grid');
+      if (!grid) return;
+
+      try {
+        const tracks = await GroicMusicService.getFeaturedTracks(6);
+        grid.innerHTML = '';
+
+        tracks.forEach(track => {
+          const card = document.createElement('div');
+          card.className = 'music-card';
+
+          const isSaved = GroicLocalLibrary.isSongSaved(track.id);
+
+          card.innerHTML = `
+            <div class="thumbnail-box">
+              <img src="${track.thumbnail || './assets/images/default-cover.svg'}" alt="${escapeHtml(track.title)}" class="thumbnail-img" loading="lazy" />
+              <div class="thumbnail-overlay">
+                <a href="./player.html?v=${track.id}&title=${encodeURIComponent(track.title)}&channel=${encodeURIComponent(track.channel)}&thumb=${encodeURIComponent(track.thumbnail)}" class="btn-play-overlay" aria-label="Play ${escapeHtml(track.title)}">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                </a>
+              </div>
+            </div>
+            <div class="card-details">
+              <div class="card-title" title="${escapeHtml(track.title)}">${escapeHtml(track.title)}</div>
+              <div class="card-channel">${escapeHtml(track.channel)}</div>
+              <div class="card-actions">
+                <a href="./player.html?v=${track.id}&title=${encodeURIComponent(track.title)}&channel=${encodeURIComponent(track.channel)}&thumb=${encodeURIComponent(track.thumbnail)}" class="btn btn-primary btn-sm" style="padding:4px 12px; font-size:0.78rem;">
+                  Play Now
+                </a>
+                <div style="display:flex; gap:4px;">
+                  <button class="btn-card-action btn-add-pl" title="Add to Playlist" aria-label="Add to Playlist">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                  </button>
+                  <button class="btn-card-action btn-save ${isSaved ? 'saved' : ''}" title="Save track" aria-label="Save track">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="${isSaved ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
+                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+
+          const saveBtn = card.querySelector('.btn-save');
+          saveBtn.addEventListener('click', () => {
+            const currentlySaved = GroicLocalLibrary.isSongSaved(track.id);
+            if (currentlySaved) {
+              GroicLocalLibrary.removeSavedSong(track.id);
+              saveBtn.classList.remove('saved');
+              saveBtn.querySelector('svg').setAttribute('fill', 'none');
+              window.GroicApp.showToast('Removed from saved songs', 'info');
+            } else {
+              GroicLocalLibrary.saveSong(track);
+              saveBtn.classList.add('saved');
+              saveBtn.querySelector('svg').setAttribute('fill', 'currentColor');
+              window.GroicApp.showToast('Saved to library', 'success');
+            }
+          });
+
+          const addPlBtn = card.querySelector('.btn-add-pl');
+          addPlBtn.addEventListener('click', () => {
+            GroicPlaylists.openAddToPlaylistModal(track);
+          });
+
+          grid.appendChild(card);
+        });
+      } catch (e) {
+        console.error('Featured tracks render error:', e);
+      }
+
+      function escapeHtml(str) {
+        return (str || '').replace(/[&<>"']/g, function (m) {
+          return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m];
+        });
+      }
+    });
+  </script>
+</body>
+</html>

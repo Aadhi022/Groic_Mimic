@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Now Playing — GROIC Web Player</title>
+  <meta name="description" content="Stream official YouTube music videos with smart queue, playlist management, and persistent listening history.">
+  <link rel="icon" type="image/svg+xml" href="./assets/images/logo.svg">
+
+  <!-- Supabase CDN Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <link rel="stylesheet" href="./css/style.css">
+  <link rel="stylesheet" href="./css/player.css">
+</head>
+<body>
+
+  <!-- Site Header -->
+  <header class="site-header">
+    <div class="nav-container">
+      <a href="./index.html" class="brand-logo" aria-label="GROIC Home">
+        <img src="./assets/images/logo.svg" alt="" class="brand-icon" />
+        <span>GROIC</span>
+        <span class="brand-tag">2.0</span>
+      </a>
+
+      <nav aria-label="Main Navigation">
+        <ul class="nav-links">
+          <li><a href="./index.html" class="nav-link">Home</a></li>
+          <li><a href="./explore.html" class="nav-link">Explore</a></li>
+          <li><a href="./rooms.html" class="nav-link">Rooms 🔥</a></li>
+          <li><a href="./player.html" class="nav-link active">Player</a></li>
+          <li><a href="./library.html" class="nav-link">My Library</a></li>
+          <li><a href="./about.html" class="nav-link">About</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <!-- Auth user slot -->
+        <div class="header-user-slot"></div>
+
+        <button id="header-mode-badge" class="mode-badge demo" aria-label="Toggle or view API settings">
+          <span class="mode-dot"></span>
+          <span>Checking...</span>
+        </button>
+
+        <button class="mobile-menu-toggle" aria-label="Open mobile navigation menu" aria-expanded="false">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="player-layout">
+        <!-- Left Stage: Video Container & Transport Controls -->
+        <div class="player-stage">
+          <div class="video-container">
+            <div class="video-glow-backdrop"></div>
+
+            <div id="player-loading-overlay" class="player-loading-overlay">
+              <div class="spinner"></div>
+              <div style="font-size:0.9rem; font-weight:600; color:var(--text-muted);">
+                Initializing YouTube Player...
+              </div>
+            </div>
+
+            <div id="yt-player-target"></div>
+          </div>
+
+          <!-- Track Info & Actions -->
+          <div class="track-header">
+            <div class="track-info">
+              <div class="now-playing-tag">
+                <span class="pulse-dot"></span>
+                <span id="player-status-badge">Now Playing</span>
+              </div>
+              <h1 class="track-title" id="now-playing-title">Loading track title...</h1>
+              <div class="track-channel" id="now-playing-channel">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                <span>Loading artist/channel...</span>
+              </div>
+            </div>
+
+            <div class="track-actions">
+              <button class="btn btn-secondary btn-icon" id="btn-player-save" title="Save to Library" aria-label="Save to Library">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                </svg>
+              </button>
+
+              <button class="btn btn-secondary btn-icon" id="btn-player-add-playlist" title="Add to Playlist" aria-label="Add to Playlist">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+              </button>
+
+              <button class="btn btn-secondary btn-icon" id="btn-player-add-room" title="Queue to a Social Room" aria-label="Queue to Room">
+                <span style="font-size:1.05rem;">📻</span>
+              </button>
+
+              <button class="btn btn-secondary btn-icon" id="btn-player-share" title="Share Track" aria-label="Share Track">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="18" cy="5" r="3"></circle>
+                  <circle cx="6" cy="12" r="3"></circle>
+                  <circle cx="18" cy="19" r="3"></circle>
+                  <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                  <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Bottom Control Bar -->
+          <div class="player-controls-bar">
+            <div class="transport-buttons">
+              <button class="btn-transport" id="btn-player-prev" title="Previous Track" aria-label="Previous Track">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="19 20 9 12 19 4 19 20"></polygon>
+                  <line x1="5" y1="19" x2="5" y2="5" stroke="currentColor" stroke-width="2"></line>
+                </svg>
+              </button>
+
+              <button class="btn-transport btn-transport-play" id="btn-player-playpause" title="Play / Pause" aria-label="Play or Pause">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+              </button>
+
+              <button class="btn-transport" id="btn-player-next" title="Next Track" aria-label="Next Track">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="5 4 15 12 5 20 5 4"></polygon>
+                  <line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2"></line>
+                </svg>
+              </button>
+            </div>
+
+            <div style="font-size:0.85rem; color:var(--text-muted); display:flex; align-items:center; gap:8px;">
+              <span>Official YouTube IFrame Player</span>
+              <span class="playback-status-pill">1080p / Auto</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Stage: Queue Sidebar -->
+        <aside class="queue-panel" aria-label="Active Playback Queue">
+          <div class="queue-header">
+            <div class="queue-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="8" y1="6" x2="21" y2="6"></line>
+                <line x1="8" y1="12" x2="21" y2="12"></line>
+                <line x1="8" y1="18" x2="21" y2="18"></line>
+                <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                <line x1="3" y1="18" x2="3.01" y2="18"></line>
+              </svg>
+              <span>Playback Queue</span>
+            </div>
+            <span class="queue-count" id="queue-total-count">0</span>
+          </div>
+
+          <ul class="queue-list" id="queue-list-container"></ul>
+        </aside>
+      </div>
+
+      <!-- Recently Played Section -->
+      <section class="recent-strip-section">
+        <div class="section-head">
+          <h2 style="font-size:1.45rem; font-weight:700;">Recently Explored</h2>
+          <a href="./library.html" class="btn btn-ghost btn-sm">View in Library &rarr;</a>
+        </div>
+
+        <div class="music-grid" id="player-recent-grid"></div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <div>&copy; 2026 GROIC — Static Web Application for GitHub Pages</div>
+        <div style="display:flex; gap:var(--space-md);">
+          <a href="./about.html">About</a>
+          <a href="#" data-action="open-settings">API Key Settings</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Core Scripts -->
+  <script src="./js/config.js"></script>
+  <script src="./js/storage.js"></script>
+  <script src="./js/services/supabase-client.js"></script>
+  <script src="./js/services/local-library-service.js"></script>
+  <script src="./js/services/supabase-library-service.js"></script>
+  <script src="./js/services/room-service.js"></script>
+  <script src="./js/youtube.js"></script>
+  <script src="./js/services/music-service.js"></script>
+  <script src="./js/playlists.js"></script>
+  <script src="./js/auth.js"></script>
+  <script src="./js/main.js"></script>
+  <script src="./js/player.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      GroicPlayer.init();
+      renderRecentlyPlayedGrid();
+
+      // Add to room queue button
+      const addRoomBtn = document.getElementById('btn-player-add-room');
+      if (addRoomBtn) {
+        addRoomBtn.addEventListener('click', () => {
+          const roomId = prompt('Enter the Social Room ID to send this track to:');
+          if (roomId && roomId.trim()) {
+            const currentVideoId = new URLSearchParams(window.location.search).get('v') || 'jfKfPfyJRdk';
+            const title = document.getElementById('now-playing-title').textContent;
+            const channel = document.getElementById('now-playing-channel').textContent;
+            
+            GroicRoomService.addToQueue(roomId.trim(), {
+              id: currentVideoId,
+              title: title,
+              channel: channel,
+              thumbnail: `https://i.ytimg.com/vi/${currentVideoId}/hqdefault.jpg`
+            }).then(res => {
+              if (res.success) {
+                window.GroicApp.showToast(res.message, 'success');
+              } else {
+                window.GroicApp.showToast(res.message, 'error');
+              }
+            });
+          }
+        });
+      }
+    });
+
+    function renderRecentlyPlayedGrid() {
+      const grid = document.getElementById('player-recent-grid');
+      if (!grid) return;
+
+      const history = GroicLocalLibrary.getHistory().slice(0, 4);
+      grid.innerHTML = '';
+
+      if (history.length === 0) {
+        grid.innerHTML = `
+          <div style="grid-column: 1 / -1; color: var(--text-muted); font-size: 0.9rem; padding: 1rem 0;">
+            No recently played tracks yet. As you listen, your history will be tracked here.
+          </div>
+        `;
+        return;
+      }
+
+      history.forEach(track => {
+        const card = document.createElement('div');
+        card.className = 'music-card';
+        card.innerHTML = `
+          <div class="thumbnail-box">
+            <img src="${track.thumbnail || './assets/images/default-cover.svg'}" alt="" class="thumbnail-img" />
+            <div class="thumbnail-overlay">
+              <a href="./player.html?v=${track.id}&title=${encodeURIComponent(track.title)}&channel=${encodeURIComponent(track.channel)}" class="btn-play-overlay">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+              </a>
+            </div>
+          </div>
+          <div class="card-details">
+            <div class="card-title">${escapeHtml(track.title)}</div>
+            <div class="card-channel">${escapeHtml(track.channel)}</div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+      function escapeHtml(str) {
+        return (str || '').replace(/[&<>"']/g, function (m) {
+          return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m];
+        });
+      }
+    }
+  </script>
+</body>
+</html>

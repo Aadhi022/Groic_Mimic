@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>About GROIC — Social Architecture & Cloud Blueprint</title>
+  <meta name="description" content="Discover the design philosophy, real-time social architecture, atomic capacity enforcement, and Supabase synchronization powering GROIC.">
+  <link rel="icon" type="image/svg+xml" href="./assets/images/logo.svg">
+
+  <!-- Supabase CDN Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <link rel="stylesheet" href="./css/style.css">
+  <style>
+    .about-hero {
+      padding: clamp(2.5rem, 6vw, 4.5rem) 0 var(--space-xl);
+      text-align: center;
+      position: relative;
+    }
+
+    .about-hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 250px;
+      background: radial-gradient(circle, var(--accent-magenta-glow) 0%, transparent 70%);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .about-section {
+      padding: var(--space-2xl) 0;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-xl);
+    }
+
+    .code-snippet-box {
+      background: #090b12;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      overflow-x: auto;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 800px) {
+      .about-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Site Header -->
+  <header class="site-header">
+    <div class="nav-container">
+      <a href="./index.html" class="brand-logo" aria-label="GROIC Home">
+        <img src="./assets/images/logo.svg" alt="" class="brand-icon" />
+        <span>GROIC</span>
+        <span class="brand-tag">2.0</span>
+      </a>
+
+      <nav aria-label="Main Navigation">
+        <ul class="nav-links">
+          <li><a href="./index.html" class="nav-link">Home</a></li>
+          <li><a href="./explore.html" class="nav-link">Explore</a></li>
+          <li><a href="./rooms.html" class="nav-link">Rooms 🔥</a></li>
+          <li><a href="./player.html" class="nav-link">Player</a></li>
+          <li><a href="./library.html" class="nav-link">My Library</a></li>
+          <li><a href="./about.html" class="nav-link active">About</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <!-- Auth user slot -->
+        <div class="header-user-slot"></div>
+
+        <button id="header-mode-badge" class="mode-badge demo" aria-label="Toggle or view API settings">
+          <span class="mode-dot"></span>
+          <span>Checking...</span>
+        </button>
+
+        <a href="./rooms.html" class="btn btn-primary btn-sm">Social Rooms</a>
+
+        <button class="mobile-menu-toggle" aria-label="Open mobile navigation menu" aria-expanded="false">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <!-- About Hero -->
+      <section class="about-hero">
+        <h1 style="font-size: clamp(2rem, 5vw, 3.25rem); font-weight: 800; margin-bottom: var(--space-xs);">
+          About <span class="text-gradient">GROIC</span>
+        </h1>
+        <p style="color: var(--text-muted); font-size: 1.15rem; max-width: 680px; margin: 0 auto var(--space-lg);">
+          The social music discovery and live listening platform engineered for real-time synchronization, zero build steps, and static GitHub Pages hosting.
+        </p>
+        <div style="display:flex; justify-content:center; gap:var(--space-md); flex-wrap:wrap;">
+          <a href="./rooms.html" class="btn btn-primary btn-sm">Explore Social Rooms 🔥</a>
+          <a href="./explore.html" class="btn btn-outline btn-sm">Search Music Catalog</a>
+        </div>
+      </section>
+
+      <!-- Vision & Philosophy -->
+      <section class="about-section">
+        <div class="about-grid">
+          <div>
+            <div style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--accent-purple); font-weight:700; margin-bottom:6px;">
+              Product Vision
+            </div>
+            <h2 style="font-size: 1.85rem; font-weight: 800; margin-bottom: var(--space-sm);">
+              Listen Together, Anywhere
+            </h2>
+            <p style="color: var(--text-muted); margin-bottom: var(--space-md); font-size: 0.98rem;">
+              Music is inherently social. GROIC is built around a single, powerful premise: <strong>Create a room. Invite your people. Discover public rooms. Listen to music together in real time.</strong>
+            </p>
+            <p style="color: var(--text-muted); font-size: 0.98rem;">
+              Whether streaming chill study beats with a friend thousands of miles away, enjoying late-night tracks with a partner in a private 2-person room, or finding community jams in public spaces, GROIC unites listeners using official YouTube embeds and Supabase Realtime synchronization.
+            </p>
+          </div>
+
+          <div class="card" style="display:flex; flex-direction:column; justify-content:center;">
+            <h3 style="font-size:1.25rem; margin-bottom:var(--space-sm); color:var(--accent-cyan);">Architecture Foundations</h3>
+            <ul style="list-style:none; display:flex; flex-direction:column; gap:var(--space-sm); font-size:0.92rem; color:var(--text-muted);">
+              <li style="display:flex; gap:10px;">
+                <span style="color:var(--accent-lime); font-weight:bold;">✓</span>
+                <span><strong>Atomic Capacity Enforcement:</strong> Secure database function (<code>join_room_atomic</code>) locks records with <code>FOR UPDATE</code> to eliminate race conditions under concurrent joins.</span>
+              </li>
+              <li style="display:flex; gap:10px;">
+                <span style="color:var(--accent-lime); font-weight:bold;">✓</span>
+                <span><strong>Best-Effort Drift Correction:</strong> <code>room-sync.js</code> calculates expected timestamp accounting for network transit, correcting drift exceeding 2.5s without infinite loops.</span>
+              </li>
+              <li style="display:flex; gap:10px;">
+                <span style="color:var(--accent-lime); font-weight:bold;">✓</span>
+                <span><strong>Multi-Tab Deduplicated Presence:</strong> <code>room-presence.js</code> tracks connected participants by user ID, avoiding artificial count inflation.</span>
+              </li>
+              <li style="display:flex; gap:10px;">
+                <span style="color:var(--accent-lime); font-weight:bold;">✓</span>
+                <span><strong>Pure Static Web Stack:</strong> 100% Vanilla JS, HTML5, CSS3, zero bundlers, zero npm, completely deployable to GitHub Pages.</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Real-Time Sync & Trending Logic -->
+      <section class="about-section" id="architecture">
+        <h2 style="font-size: 1.85rem; font-weight: 800; margin-bottom: var(--space-sm);">
+          Real-Time Social Sync & Trending Algorithms
+        </h2>
+        <p style="color: var(--text-muted); margin-bottom: var(--space-xl); max-width: 760px;">
+          How GROIC achieves high-accuracy shared playback and active trending rankings across distributed static clients.
+        </p>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:var(--space-lg); margin-bottom:var(--space-2xl);">
+          <div class="card">
+            <h4 style="font-size:1.1rem; margin-bottom:8px; color:var(--accent-coral);">🔥 Trending Rooms Score</h4>
+            <p style="font-size:0.88rem; color:var(--text-muted); margin-bottom:var(--space-sm);">
+              Calculated via SQL stored procedure:
+            </p>
+            <div style="font-family:monospace; font-size:0.78rem; background:rgba(0,0,0,0.3); padding:8px; border-radius:6px; color:#cbd5e1;">
+              (Participants × 15) + (Recent Activities × 5) + (Occupancy% × 20) - (Hours × 0.4)
+            </div>
+            <p style="font-size:0.8rem; color:var(--text-subtle); margin-top:8px;">
+              Ensures active, fresh rooms with real listeners trend above stale or empty rooms.
+            </p>
+          </div>
+
+          <div class="card">
+            <h4 style="font-size:1.1rem; margin-bottom:8px; color:var(--accent-purple);">⏱️ Authoritative Playback State</h4>
+            <p style="font-size:0.88rem; color:var(--text-muted); margin-bottom:var(--space-sm);">
+              Room rows hold:
+            </p>
+            <div style="font-family:monospace; font-size:0.78rem; background:rgba(0,0,0,0.3); padding:8px; border-radius:6px; color:#cbd5e1;">
+              playback_position + (now - updated_at) × playback_rate
+            </div>
+            <p style="font-size:0.8rem; color:var(--text-subtle); margin-top:8px;">
+              Late joiners immediately calculate the exact millisecond offset and jump right into the audio stream.
+            </p>
+          </div>
+
+          <div class="card">
+            <h4 style="font-size:1.1rem; margin-bottom:8px; color:var(--accent-cyan);">🔒 Private Invitation Tokens</h4>
+            <p style="font-size:0.88rem; color:var(--text-muted); margin-bottom:var(--space-sm);">
+              Private rooms use 8-character cryptographically random tokens:
+            </p>
+            <div style="font-family:monospace; font-size:0.78rem; background:rgba(0,0,0,0.3); padding:8px; border-radius:6px; color:#cbd5e1;">
+              join_room_atomic(p_room_id, p_invite_code)
+            </div>
+            <p style="font-size:0.8rem; color:var(--text-subtle); margin-top:8px;">
+              Excluded from public discovery, trending rankings, and protected by PostgreSQL RLS.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Supabase Migration & SQL Schema -->
+      <section class="about-section" id="supabase">
+        <div style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--accent-lime); font-weight:700; margin-bottom:6px;">
+          Database Security & Schema
+        </div>
+        <h2 style="font-size: 1.85rem; font-weight: 800; margin-bottom: var(--space-sm);">
+          Atomic Capacity & Row Level Security (RLS)
+        </h2>
+        <p style="color: var(--text-muted); margin-bottom: var(--space-lg); max-width: 760px;">
+          All room capacity limits (2, 4, 6, 8, 10) are enforced in PostgreSQL transactions. You can find the full schema in <code>supabase/schema.sql</code>.
+        </p>
+
+        <div class="code-snippet-box">
+          <div style="color:var(--accent-purple); font-weight:bold; margin-bottom:0.5rem;">-- Excerpt from supabase/schema.sql: Atomic Capacity Lock</div>
+<pre>-- Lock room record to prevent race conditions during concurrent joins
+select * into v_room from public.rooms where id = p_room_id for update;
+
+-- Count current active participants
+select count(*) into v_current_count from public.room_memberships
+where room_id = p_room_id and status = 'active';
+
+-- Strictly enforce configured room capacity
+if v_current_count >= v_room.max_capacity then
+  return jsonb_build_object('success', false, 'error', 'Room is full');
+end if;</pre>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <div>&copy; 2026 GROIC — Static Web Application for GitHub Pages</div>
+        <div style="display:flex; gap:var(--space-md);">
+          <a href="./about.html">About</a>
+          <a href="#" data-action="open-settings">API Key Settings</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Core Scripts -->
+  <script src="./js/config.js"></script>
+  <script src="./js/storage.js"></script>
+  <script src="./js/services/supabase-client.js"></script>
+  <script src="./js/services/local-library-service.js"></script>
+  <script src="./js/services/supabase-library-service.js"></script>
+  <script src="./js/services/room-service.js"></script>
+  <script src="./js/auth.js"></script>
+  <script src="./js/main.js"></script>
+</body>
+</html>

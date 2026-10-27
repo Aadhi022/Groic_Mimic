@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>My Music Library — GROIC</title>
+  <meta name="description" content="Your personal music library: saved songs, custom playlists, and listening history. Stored locally with cloud-ready architecture.">
+  <link rel="icon" type="image/svg+xml" href="./assets/images/logo.svg">
+
+  <!-- Supabase CDN Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <link rel="stylesheet" href="./css/style.css">
+  <link rel="stylesheet" href="./css/library.css">
+</head>
+<body>
+
+  <!-- Site Header -->
+  <header class="site-header">
+    <div class="nav-container">
+      <a href="./index.html" class="brand-logo" aria-label="GROIC Home">
+        <img src="./assets/images/logo.svg" alt="" class="brand-icon" />
+        <span>GROIC</span>
+        <span class="brand-tag">MVP</span>
+      </a>
+
+      <nav aria-label="Main Navigation">
+        <ul class="nav-links">
+          <li><a href="./index.html" class="nav-link">Home</a></li>
+          <li><a href="./explore.html" class="nav-link">Explore</a></li>
+          <li><a href="./rooms.html" class="nav-link">Rooms 🔥</a></li>
+          <li><a href="./player.html" class="nav-link">Player</a></li>
+          <li><a href="./library.html" class="nav-link">My Library</a></li>
+          <li><a href="./about.html" class="nav-link">About</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <!-- Auth user slot -->
+        <div class="header-user-slot"></div>
+
+        <button id="header-mode-badge" class="mode-badge demo" aria-label="Toggle or view API settings">
+          <span class="mode-dot"></span>
+          <span>Checking...</span>
+        </button>
+
+        <button class="mobile-menu-toggle" aria-label="Open mobile navigation menu" aria-expanded="false">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <!-- Library Header -->
+      <section class="library-header">
+        <div>
+          <h1 class="library-title">My <span class="text-gradient">Collection</span></h1>
+          <p class="library-subtitle">Manage your favorite tracks, custom playlists, and listening journey.</p>
+        </div>
+
+        <div style="display:flex; gap:var(--space-sm);">
+          <button class="btn btn-primary btn-sm" id="btn-create-playlist">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>New Playlist</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Cloud Migration Architecture Notice -->
+      <div class="storage-status-banner">
+        <div class="storage-status-content">
+          <div class="storage-status-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+              <polyline points="17 21 17 13 7 13 7 21"></polyline>
+              <polyline points="7 3 7 8 15 8"></polyline>
+            </svg>
+          </div>
+          <div class="storage-status-text" id="library-storage-status-text">
+            <h4>Local Browser Storage Active</h4>
+            <p>Your library is saved locally in this browser. Architecture is pre-wired for Supabase Cloud Database & Auth.</p>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:8px; align-items:center;">
+          <button class="btn btn-secondary btn-sm" id="btn-cloud-sync-info">
+            <span>Sign In to Sync</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
+
+          <button class="btn btn-primary btn-sm" id="btn-import-to-cloud" style="display:none;">
+            <span>Import Local to Cloud</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Library Navigation Tabs -->
+      <nav class="library-tabs" aria-label="Library Sections">
+        <button class="tab-btn active" data-tab="saved">
+          <span>Saved Songs</span>
+          <span class="tab-badge" id="badge-saved-count">0</span>
+        </button>
+        <button class="tab-btn" data-tab="playlists">
+          <span>Playlists</span>
+          <span class="tab-badge" id="badge-playlists-count">0</span>
+        </button>
+        <button class="tab-btn" data-tab="history">
+          <span>Listening History</span>
+          <span class="tab-badge" id="badge-history-count">0</span>
+        </button>
+      </nav>
+
+      <!-- Tab 1: Saved Songs Panel -->
+      <section class="tab-panel active" id="tab-panel-saved" aria-label="Saved Songs">
+        <div class="song-list" id="saved-songs-list">
+          <!-- Dynamically populated -->
+        </div>
+      </section>
+
+      <!-- Tab 2: Playlists Panel -->
+      <section class="tab-panel" id="tab-panel-playlists" aria-label="Playlists">
+        <div class="playlist-grid" id="playlists-grid">
+          <!-- Dynamically populated playlist cards -->
+        </div>
+
+        <!-- Single Playlist Detail View Container -->
+        <div id="playlist-detail-view" style="display:none;"></div>
+      </section>
+
+      <!-- Tab 3: History Panel -->
+      <section class="tab-panel" id="tab-panel-history" aria-label="Listening History">
+        <div class="tab-toolbar">
+          <div style="font-size:0.9rem; color:var(--text-muted);">
+            Tracks are automatically tracked as you listen in the Web Player.
+          </div>
+          <button class="btn btn-ghost btn-sm" id="btn-clear-history" style="color:var(--accent-coral);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            <span>Clear History</span>
+          </button>
+        </div>
+
+        <div class="song-list" id="history-songs-list">
+          <!-- Dynamically populated -->
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <div>&copy; 2026 GROIC — Static Web Application for GitHub Pages</div>
+        <div style="display:flex; gap:var(--space-md);">
+          <a href="./about.html">About</a>
+          <a href="#" data-action="open-settings">API Key Settings</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Core Scripts -->
+  <script src="./js/config.js"></script>
+  <script src="./js/storage.js"></script>
+  <script src="./js/services/supabase-client.js"></script>
+  <script src="./js/services/local-library-service.js"></script>
+  <script src="./js/services/supabase-library-service.js"></script>
+  <script src="./js/youtube.js"></script>
+  <script src="./js/services/music-service.js"></script>
+  <script src="./js/playlists.js"></script>
+  <script src="./js/auth.js"></script>
+  <script src="./js/main.js"></script>
+  <script src="./js/library.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      GroicLibrary.init();
+    });
+  </script>
+</body>
+</html>

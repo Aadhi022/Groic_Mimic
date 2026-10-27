@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Social Rooms & Live Listening — GROIC</title>
+  <meta name="description" content="Create private listening rooms, discover public music spaces, and listen to YouTube music together in real time.">
+  <link rel="icon" type="image/svg+xml" href="./assets/images/logo.svg">
+
+  <!-- Supabase CDN Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Core Styles -->
+  <link rel="stylesheet" href="./css/style.css">
+  <link rel="stylesheet" href="./css/rooms.css">
+</head>
+<body>
+
+  <!-- Site Header -->
+  <header class="site-header">
+    <div class="nav-container">
+      <a href="./index.html" class="brand-logo" aria-label="GROIC Home">
+        <img src="./assets/images/logo.svg" alt="" class="brand-icon" />
+        <span>GROIC</span>
+        <span class="brand-tag">2.0</span>
+      </a>
+
+      <nav aria-label="Main Navigation">
+        <ul class="nav-links">
+          <li><a href="./index.html" class="nav-link">Home</a></li>
+          <li><a href="./explore.html" class="nav-link">Explore</a></li>
+          <li><a href="./rooms.html" class="nav-link active">Rooms 🔥</a></li>
+          <li><a href="./player.html" class="nav-link">Player</a></li>
+          <li><a href="./library.html" class="nav-link">My Library</a></li>
+          <li><a href="./about.html" class="nav-link">About</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <!-- Auth user slot -->
+        <div class="header-user-slot"></div>
+
+        <!-- Mode badge -->
+        <button id="header-mode-badge" class="mode-badge demo" aria-label="Toggle or view API settings">
+          <span class="mode-dot"></span>
+          <span>Checking...</span>
+        </button>
+
+        <button class="btn btn-primary btn-sm" data-action="open-create-room">
+          + Create Room
+        </button>
+
+        <button class="mobile-menu-toggle" aria-label="Open mobile navigation menu" aria-expanded="false">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <!-- Rooms Hero Section -->
+      <section class="rooms-hero">
+        <div style="display:inline-flex; align-items:center; gap:8px; background:rgba(236,72,153,0.12); border:1px solid rgba(236,72,153,0.3); padding:6px 14px; border-radius:var(--radius-full); font-size:0.82rem; font-weight:700; color:var(--accent-magenta); margin-bottom:var(--space-md); text-transform:uppercase; letter-spacing:0.08em;">
+          <span>Synchronized Social Music</span>
+        </div>
+
+        <h1 style="font-size:clamp(2.2rem, 5vw, 3.5rem); font-weight:800; margin-bottom:var(--space-xs);">
+          Listen to Music <span class="text-gradient">Together in Real Time.</span>
+        </h1>
+        <p style="color:var(--text-muted); font-size:1.1rem; max-width:640px; margin:0 auto var(--space-xl);">
+          Create a private room for you and your partner, jam with friends, or discover community listening sessions.
+        </p>
+
+        <!-- Join via Secret Code / Link -->
+        <form class="join-code-strip" id="join-code-form">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-muted); flex-shrink:0;">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          <input 
+            type="text" 
+            id="join-code-input" 
+            class="join-code-input" 
+            placeholder="Have a room code or link? Paste it here..." 
+            autocomplete="off"
+          />
+          <button type="submit" class="btn btn-secondary btn-sm" style="flex-shrink:0;">
+            Join Room
+          </button>
+        </form>
+
+        <div style="display:flex; justify-content:center; gap:var(--space-md); flex-wrap:wrap;">
+          <button class="btn btn-primary btn-lg" data-action="open-create-room">
+            Launch Your Room
+          </button>
+          <a href="#public-rooms-section" class="btn btn-secondary btn-lg">
+            Browse Public Rooms
+          </a>
+        </div>
+      </section>
+
+      <!-- Supabase Setup Notice (If Not Configured) -->
+      <div id="rooms-setup-banner" class="storage-status-banner" style="display:none; margin-bottom:var(--space-2xl);">
+        <div class="storage-status-content">
+          <div class="storage-status-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
+            </svg>
+          </div>
+          <div class="storage-status-text">
+            <h4>Supabase Setup Required for Live Multi-User Sync</h4>
+            <p>
+              GROIC is currently showing sample demonstration rooms. To enable real-time synchronized playback, live presence, and private rooms across devices, configure your Supabase project in Settings.
+            </p>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-sm" data-action="open-settings">
+          Connect Supabase
+        </button>
+      </div>
+
+      <!-- Trending Rooms Section -->
+      <section style="margin-bottom:var(--space-3xl);">
+        <div class="results-header">
+          <div>
+            <h2 style="font-size:1.75rem; font-weight:800; display:flex; align-items:center; gap:8px;">
+              <span>Trending Rooms</span>
+              <span style="font-size:1.4rem;">🔥</span>
+            </h2>
+            <p style="color:var(--text-muted); font-size:0.92rem;">
+              Ranked dynamically by active listeners, occupancy, and room freshness.
+            </p>
+          </div>
+        </div>
+
+        <div class="trending-grid" id="trending-rooms-container">
+          <!-- Populated by GroicRooms.renderTrendingRooms() -->
+        </div>
+      </section>
+
+      <!-- Public Rooms Discovery Section -->
+      <section id="public-rooms-section" style="margin-bottom:var(--space-3xl);">
+        <div class="results-header">
+          <div>
+            <h2 style="font-size:1.75rem; font-weight:800;">Public Listening Spaces</h2>
+            <p style="color:var(--text-muted); font-size:0.92rem;">Jump in and listen to what the community is streaming right now</p>
+          </div>
+
+          <div style="display:flex; gap:var(--space-sm); align-items:center; flex-wrap:wrap;">
+            <input 
+              type="text" 
+              id="rooms-search-input" 
+              class="form-input" 
+              placeholder="Search rooms by name..." 
+              style="width:240px; padding:6px 12px; font-size:0.88rem;"
+            />
+          </div>
+        </div>
+
+        <!-- Room Filter Chips -->
+        <div class="chips-container" style="justify-content:flex-start; margin-bottom:var(--space-lg);">
+          <button class="chip room-filter-chip active" data-mood="all">All Rooms</button>
+          <button class="chip room-filter-chip" data-mood="chill">☕ Chill & Focus</button>
+          <button class="chip room-filter-chip" data-mood="synthwave">🌌 Synthwave</button>
+          <button class="chip room-filter-chip" data-mood="lofi">📚 Lo-Fi</button>
+          <button class="chip room-filter-chip" data-mood="electronic">⚡ Electronic</button>
+          <button class="chip room-filter-chip" data-mood="rock">🎸 Rock</button>
+          <button class="chip room-filter-chip" data-mood="pop">✨ Pop</button>
+        </div>
+
+        <div class="public-rooms-grid" id="public-rooms-grid">
+          <!-- Populated by GroicRooms.renderPublicRooms() -->
+        </div>
+
+        <div id="public-rooms-empty" class="state-box" style="display:none;">
+          <div class="state-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+            </svg>
+          </div>
+          <h3 class="state-title">No Active Public Rooms</h3>
+          <p class="state-desc">There are no open public rooms right now. Launch one and share your sound with the world!</p>
+          <button class="btn btn-primary" data-action="open-create-room">Create the First Room</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <div>&copy; 2026 GROIC — Social Music Listening Platform. Hosted on GitHub Pages.</div>
+        <div style="display:flex; gap:var(--space-md);">
+          <a href="./about.html">About & Privacy</a>
+          <a href="#" data-action="open-settings">API & Cloud Settings</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="./js/config.js"></script>
+  <script src="./js/storage.js"></script>
+  <script src="./js/services/supabase-client.js"></script>
+  <script src="./js/services/local-library-service.js"></script>
+  <script src="./js/services/supabase-library-service.js"></script>
+  <script src="./js/services/room-service.js"></script>
+  <script src="./js/auth.js"></script>
+  <script src="./js/main.js"></script>
+  <script src="./js/rooms.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      GroicRooms.init();
+
+      // Show setup banner if Supabase is unconfigured
+      const isCloud = window.GroicSupabase && window.GroicSupabase.isConfigured();
+      const banner = document.getElementById('rooms-setup-banner');
+      if (banner && !isCloud) {
+        banner.style.display = 'flex';
+      }
+    });
+  </script>
+</body>
+</html>

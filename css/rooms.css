@@ -1,0 +1,697 @@
+/* ==========================================================================
+   GROIC - Social Rooms & Discovery Styles
+   ========================================================================== */
+
+.rooms-hero {
+  padding: var(--space-2xl) 0 var(--space-lg);
+  text-align: center;
+  position: relative;
+}
+
+.rooms-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 700px;
+  height: 280px;
+  background: radial-gradient(circle, rgba(236, 72, 153, 0.2) 0%, rgba(139, 92, 246, 0.1) 40%, transparent 70%);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   Join via Code Bar
+   -------------------------------------------------------------------------- */
+.join-code-strip {
+  max-width: 600px;
+  margin: 0 auto var(--space-2xl);
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  padding: 6px 8px 6px 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: var(--shadow-md);
+}
+
+.join-code-input {
+  flex: 1;
+  background: none;
+  border: none;
+  color: var(--text-main);
+  outline: none;
+  font-size: 0.95rem;
+}
+
+/* --------------------------------------------------------------------------
+   Trending Rooms Grid
+   -------------------------------------------------------------------------- */
+.trending-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--space-lg);
+  margin-bottom: var(--space-3xl);
+}
+
+.trending-room-card {
+  background: linear-gradient(145deg, #181d30 0%, #111526 100%);
+  border: 1px solid rgba(249, 115, 22, 0.3);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  position: relative;
+  transition: all var(--transition-normal);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4), 0 0 20px rgba(249, 115, 22, 0.08);
+}
+
+.trending-room-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent-coral);
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.6), 0 0 25px var(--accent-coral-glow);
+}
+
+.trending-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(249, 115, 22, 0.15);
+  border: 1px solid rgba(249, 115, 22, 0.4);
+  color: var(--accent-coral);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+}
+
+/* --------------------------------------------------------------------------
+   Public Rooms Grid
+   -------------------------------------------------------------------------- */
+.public-rooms-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: var(--space-lg);
+  margin-bottom: var(--space-3xl);
+}
+
+.room-card {
+  background: var(--grad-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  transition: all var(--transition-normal);
+}
+
+.room-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-md);
+}
+
+.room-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.room-card-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.room-card-desc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: var(--space-md);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.room-privacy-tag {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+}
+
+.room-privacy-tag.public {
+  background: rgba(6, 182, 212, 0.15);
+  color: var(--accent-cyan);
+  border: 1px solid rgba(6, 182, 212, 0.35);
+}
+
+.room-privacy-tag.private {
+  background: rgba(236, 72, 153, 0.15);
+  color: var(--accent-magenta);
+  border: 1px solid rgba(236, 72, 153, 0.35);
+}
+
+.room-demo-tag {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--accent-coral);
+  background: rgba(249, 115, 22, 0.12);
+  border: 1px solid rgba(249, 115, 22, 0.3);
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+}
+
+.room-capacity-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px 9px;
+  border-radius: var(--radius-full);
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.room-capacity-badge.full {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.room-playing-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background: rgba(0, 0, 0, 0.25);
+  padding: 6px 10px;
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-md);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.room-playing-thumb {
+  width: 38px;
+  height: 28px;
+  border-radius: 4px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.room-playing-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.room-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* --------------------------------------------------------------------------
+   Room Detail Experience (room.html Layout)
+   -------------------------------------------------------------------------- */
+.room-layout {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: var(--space-xl);
+  padding: var(--space-lg) 0 var(--space-3xl);
+  align-items: start;
+}
+
+.room-stage {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.room-sidebar {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  display: flex;
+  flex-direction: column;
+  height: 720px;
+  position: sticky;
+  top: calc(var(--header-height) + var(--space-md));
+}
+
+.room-sidebar-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.room-tab-btn {
+  flex: 1;
+  padding: var(--space-md);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-align: center;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.room-tab-btn.active {
+  color: var(--text-main);
+  border-bottom-color: var(--accent-magenta);
+}
+
+.participant-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  transition: background var(--transition-fast);
+}
+
+.participant-item:hover {
+  background: var(--bg-card-hover);
+}
+
+.participant-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--grad-primary);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.participant-online-dot {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--accent-lime);
+  border: 2px solid var(--bg-card);
+}
+
+.participant-name {
+  font-size: 0.88rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 1024px) {
+  .room-layout {
+    grid-template-columns: 1fr;
+  }
+  .room-sidebar {
+    height: 520px;
+    position: static;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Local file:/// Protocol Advisory Banner
+   -------------------------------------------------------------------------- */
+.local-protocol-alert {
+  background: linear-gradient(90deg, rgba(249, 115, 22, 0.15), rgba(236, 72, 153, 0.12));
+  border: 1px solid rgba(249, 115, 22, 0.35);
+  border-radius: var(--radius-lg);
+  padding: 10px 16px;
+  margin-bottom: var(--space-md);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  font-size: 0.88rem;
+  color: var(--text-main);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+}
+
+.local-protocol-alert .alert-icon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.local-protocol-alert code {
+  background: rgba(0, 0, 0, 0.4);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--accent-coral);
+  font-family: monospace;
+  font-size: 0.82rem;
+}
+
+/* --------------------------------------------------------------------------
+   YouTube Player Error 153 & Fallback Overlay
+   -------------------------------------------------------------------------- */
+.player-error-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 13, 22, 0.94);
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+  padding: var(--space-lg);
+  text-align: center;
+  border-radius: inherit;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.player-error-content {
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.player-error-badge {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #ef4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.player-error-heading {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.player-error-text {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.player-error-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+/* --------------------------------------------------------------------------
+   Separated Room Queue Layout (Now Playing vs Upcoming)
+   -------------------------------------------------------------------------- */
+.queue-panel-head {
+  padding: 12px var(--space-md);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.queue-panel-scroll {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding: var(--space-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* Now Playing Card inside Sidebar */
+.room-now-playing-box {
+  background: linear-gradient(145deg, rgba(139, 92, 246, 0.12), rgba(236, 72, 153, 0.08));
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  border-radius: var(--radius-lg);
+  padding: 12px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.room-now-playing-tag {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.equalizer-mini {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 12px;
+}
+
+.equalizer-mini span {
+  width: 2.5px;
+  background-color: var(--accent-magenta);
+  border-radius: 1px;
+  animation: miniEq 1s ease-in-out infinite alternate;
+}
+
+.equalizer-mini span:nth-child(1) { height: 40%; animation-delay: 0s; }
+.equalizer-mini span:nth-child(2) { height: 100%; animation-delay: 0.2s; }
+.equalizer-mini span:nth-child(3) { height: 60%; animation-delay: 0.4s; }
+
+@keyframes miniEq {
+  0% { height: 25%; }
+  100% { height: 100%; }
+}
+
+.now-playing-thumb {
+  width: 58px;
+  height: 42px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Upcoming Songs Section */
+.upcoming-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 6px;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  color: var(--text-subtle);
+}
+
+.upcoming-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.upcoming-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 8px 10px;
+  transition: all var(--transition-fast);
+}
+
+.upcoming-item:hover {
+  border-color: var(--border-hover);
+  background: var(--bg-card-hover);
+  transform: translateX(2px);
+}
+
+.upcoming-index {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-subtle);
+  min-width: 18px;
+  text-align: center;
+}
+
+.upcoming-thumb {
+  width: 48px;
+  height: 36px;
+  border-radius: 4px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.upcoming-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.upcoming-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+
+.upcoming-meta {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.upcoming-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.btn-queue-action {
+  background: transparent;
+  border: none;
+  color: var(--text-subtle);
+  padding: 4px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-queue-action:hover:not(:disabled) {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.btn-queue-action:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+.btn-queue-action.action-remove:hover {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.12);
+}
+
+.btn-queue-action.action-playnext:hover {
+  color: var(--accent-cyan);
+  background: rgba(6, 182, 212, 0.12);
+}
+
+/* --------------------------------------------------------------------------
+   Add Music Modal & Search Experience
+   -------------------------------------------------------------------------- */
+.genre-chips-scroll {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+  scrollbar-width: thin;
+}
+
+.genre-chip {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  border-radius: var(--radius-full);
+  padding: 4px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.genre-chip:hover {
+  background: rgba(236, 72, 153, 0.12);
+  border-color: var(--accent-magenta);
+  color: var(--text-main);
+}
+
+.search-results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 380px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.search-result-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  gap: 12px;
+  transition: all var(--transition-fast);
+}
+
+.search-result-card:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-hover);
+}
+
+.search-result-thumb {
+  width: 52px;
+  height: 39px;
+  object-fit: cover;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.btn-queue-add.btn-adding {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.btn-queue-add.btn-added {
+  background: rgba(132, 204, 22, 0.2) !important;
+  color: var(--accent-lime) !important;
+  border-color: rgba(132, 204, 22, 0.4) !important;
+  pointer-events: none;
+}
+

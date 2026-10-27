@@ -1,0 +1,393 @@
+/* ==========================================================================
+   GROIC - Explore & Discovery Page Styles
+   ========================================================================== */
+
+.explore-hero {
+  padding: var(--space-2xl) 0 var(--space-lg);
+  text-align: center;
+  position: relative;
+}
+
+.explore-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 250px;
+  background: radial-gradient(circle, var(--accent-purple-glow) 0%, transparent 70%);
+  z-index: -1;
+  pointer-events: none;
+}
+
+.explore-title {
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  font-weight: 800;
+  margin-bottom: var(--space-sm);
+}
+
+.explore-subtitle {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  max-width: 620px;
+  margin: 0 auto var(--space-xl);
+}
+
+/* --------------------------------------------------------------------------
+   Search Bar Interface
+   -------------------------------------------------------------------------- */
+.search-wrapper {
+  max-width: 680px;
+  margin: 0 auto var(--space-xl);
+  position: relative;
+}
+
+.search-form {
+  display: flex;
+  align-items: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  padding: 6px 8px 6px 20px;
+  box-shadow: var(--shadow-md), 0 0 20px rgba(0, 0, 0, 0.4);
+  transition: all var(--transition-normal);
+}
+
+.search-form:focus-within {
+  border-color: var(--accent-purple);
+  box-shadow: var(--shadow-lg), 0 0 25px var(--accent-purple-glow);
+}
+
+.search-icon {
+  color: var(--text-muted);
+  margin-right: var(--space-xs);
+  flex-shrink: 0;
+}
+
+.search-input {
+  flex: 1;
+  background: none;
+  border: none;
+  color: var(--text-main);
+  font-size: 1rem;
+  outline: none;
+  width: 100%;
+}
+
+.search-input::placeholder {
+  color: var(--text-subtle);
+}
+
+.search-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-clear {
+  color: var(--text-muted);
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-fast);
+}
+
+.btn-clear.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.btn-clear:hover {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.btn-search {
+  padding: 0.65rem 1.4rem;
+}
+
+/* --------------------------------------------------------------------------
+   Genre & Mood Filter Chips
+   -------------------------------------------------------------------------- */
+.filter-section {
+  margin-bottom: var(--space-2xl);
+}
+
+.filter-heading {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-subtle);
+  margin-bottom: var(--space-sm);
+  text-align: center;
+}
+
+.chips-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.chip {
+  padding: 0.45rem 1rem;
+  font-size: 0.88rem;
+  font-weight: 500;
+  border-radius: var(--radius-full);
+  background: var(--bg-card);
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.chip:hover {
+  color: var(--text-main);
+  border-color: var(--border-hover);
+  background: var(--bg-card-hover);
+  transform: translateY(-1px);
+}
+
+.chip.active {
+  background: var(--grad-primary);
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 0 14px var(--accent-magenta-glow);
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+   Status Indicators & Info Banners
+   -------------------------------------------------------------------------- */
+.results-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-lg);
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.results-query-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.catalog-source-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.catalog-source-tag.demo {
+  background: rgba(249, 115, 22, 0.12);
+  color: var(--accent-coral);
+  border: 1px solid rgba(249, 115, 22, 0.3);
+}
+
+.catalog-source-tag.live {
+  background: rgba(132, 204, 22, 0.12);
+  color: var(--accent-lime);
+  border: 1px solid rgba(132, 204, 22, 0.3);
+}
+
+/* --------------------------------------------------------------------------
+   Music Cards Grid
+   -------------------------------------------------------------------------- */
+.music-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-lg);
+  margin-bottom: var(--space-2xl);
+}
+
+.music-card {
+  background: var(--grad-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all var(--transition-normal);
+  position: relative;
+}
+
+.music-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--border-hover);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(139, 92, 246, 0.15);
+}
+
+.thumbnail-box {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background-color: #0f121d;
+  overflow: hidden;
+}
+
+.thumbnail-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--transition-slow);
+}
+
+.music-card:hover .thumbnail-img {
+  transform: scale(1.06);
+}
+
+.thumbnail-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.music-card:hover .thumbnail-overlay,
+.music-card:focus-within .thumbnail-overlay {
+  opacity: 1;
+}
+
+.btn-play-overlay {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--grad-primary);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 20px var(--accent-magenta);
+  transform: scale(0.85);
+  transition: transform var(--transition-normal);
+}
+
+.music-card:hover .btn-play-overlay {
+  transform: scale(1);
+}
+
+.card-details {
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.card-title {
+  font-size: 0.98rem;
+  font-weight: 600;
+  line-height: 1.35;
+  margin-bottom: 6px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: var(--text-main);
+}
+
+.card-channel {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-bottom: var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: var(--space-xs);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.btn-card-action {
+  padding: 6px;
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.8rem;
+  transition: all var(--transition-fast);
+}
+
+.btn-card-action:hover {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.btn-card-action.saved {
+  color: var(--accent-magenta);
+}
+
+/* --------------------------------------------------------------------------
+   Load More & Pagination
+   -------------------------------------------------------------------------- */
+.pagination-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--space-3xl);
+}
+
+/* --------------------------------------------------------------------------
+   Loading Skeletons & Empty States
+   -------------------------------------------------------------------------- */
+.skeleton-card {
+  height: 280px;
+  background: linear-gradient(90deg, #151a2b 25%, #1d233a 50%, #151a2b 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-lg);
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.state-box {
+  text-align: center;
+  padding: var(--space-3xl) var(--space-md);
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.state-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto var(--space-md);
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+
+.state-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-bottom: var(--space-xs);
+}
+
+.state-desc {
+  color: var(--text-muted);
+  margin-bottom: var(--space-lg);
+  font-size: 0.95rem;
+}
